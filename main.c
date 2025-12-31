@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include <stdarg.h>
 #include "auth.h"
 #include "utils.h"
 #include "club.h"
@@ -147,7 +151,7 @@ void initializeSystem() {
         }
     }
 
-    printf("系统初始化完成\n");
+    print_fmt("系统初始化完成\n");
 }
 
 /**
@@ -170,6 +174,43 @@ void cleanupSystem() {
     clearLogs();
 }
 
+// UTF-8 safe printing on Windows: format into UTF-8 then convert to wide and WriteConsoleW
+#ifdef _WIN32
+void print_utf8(const char* utf8) {
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (h == INVALID_HANDLE_VALUE) {
+        printf("%s", utf8);
+        return;
+    }
+    int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
+    if (wlen <= 0) {
+        printf("%s", utf8);
+        return;
+    }
+    wchar_t* wbuf = (wchar_t*)malloc(wlen * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wbuf, wlen);
+    DWORD written;
+    WriteConsoleW(h, wbuf, wlen - 1, &written, NULL);
+    free(wbuf);
+}
+
+void print_fmt(const char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    int needed = vsnprintf(NULL, 0, fmt, ap);
+    va_end(ap);
+    if (needed < 0) { return; }
+    char* buf = (char*)malloc(needed + 1);
+    va_start(ap, fmt);
+    vsnprintf(buf, needed + 1, fmt, ap);
+    va_end(ap);
+    print_utf8(buf);
+    free(buf);
+}
+#else
+#define print_fmt(...) printf(__VA_ARGS__)
+#endif
+
 /**
  * @brief 主函数
  * @return 程序退出码
@@ -177,6 +218,11 @@ void cleanupSystem() {
 int main() {
     // 使程序使用系统区域设置，以便正确输出多字节（中文）
     setlocale(LC_ALL, "");
+    // 在 Windows 下切换控制台到 UTF-8 编码，避免中文输出乱码
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     int choice;
     
     // 初始化系统
@@ -184,11 +230,11 @@ int main() {
 
     // 主菜单循环
     do {
-        printf("\n=== 社团管理系统 ===\n");
-        printf("1. 注册\n");
-        printf("2. 登录\n");
-        printf("3. 退出系统\n");
-        printf("选择: ");
+        print_fmt("\n=== 社团管理系统 ===\n");
+        print_fmt("1. 注册\n");
+        print_fmt("2. 登录\n");
+        print_fmt("3. 退出系统\n");
+        print_fmt("选择: ");
         
         if (scanf("%d", &choice) != 1) {
             printf("无效的输入！\n");
