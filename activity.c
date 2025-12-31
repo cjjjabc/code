@@ -6,10 +6,7 @@
 #include <string.h>
 #include <time.h>
 
-// 全局变量定义
-Activity* activityList = NULL;
-Enrollment* enrollmentList = NULL;
-int activityIdCounter = 2000;
+// 全局变量在 main.c 中定义，此处仅使用
 
 /**
  * @brief 创建活动

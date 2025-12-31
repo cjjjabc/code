@@ -6,8 +6,7 @@
 #include <string.h>
 #include <time.h>
 
-// 全局变量定义
-Club* clubList = NULL;
+// 全局变量在 main.c 中定义，此处仅使用
 
 /**
  * @brief 创建社团（管理员功能）

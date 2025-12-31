@@ -4,9 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// 全局变量定义
-User* userList = NULL;
-User* currentUser = NULL;
+// 全局变量在 main.c 中定义，此处仅使用
 
 /**
  * @brief 用户注册

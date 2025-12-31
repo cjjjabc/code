@@ -5,8 +5,7 @@
 #include <ctype.h>
 #include <time.h>
 
-// 全局日志链表
-Log* logList = NULL;
+// 全局日志链表在 main.c 中定义，此处仅使用
 
 /**
  * @brief 添加系统日志

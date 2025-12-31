@@ -3,6 +3,11 @@
 
 #include "data.h"
 
+// 全局变量（在 main.c 中定义）
+extern Activity* activityList;
+extern Enrollment* enrollmentList;
+extern int activityIdCounter;
+
 // ==================== 活动管理 ====================
 
 /**

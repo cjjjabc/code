@@ -2,14 +2,13 @@
 #include "finance.h"
 #include "club.h"
 #include "utils.h"
+#include "auth.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-// 全局变量定义
-FinanceRecord* financeList = NULL;
-int financeIdCounter = 1000;
+// 全局变量在 main.c 中定义，此处仅使用
 
 /**
  * @brief 添加财务记录

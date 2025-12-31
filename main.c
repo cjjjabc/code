@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 #include "auth.h"
 #include "utils.h"
 #include "club.h"
@@ -174,6 +175,8 @@ void cleanupSystem() {
  * @return 程序退出码
  */
 int main() {
+    // 使程序使用系统区域设置，以便正确输出多字节（中文）
+    setlocale(LC_ALL, "");
     int choice;
     
     // 初始化系统

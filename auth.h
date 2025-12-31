@@ -3,6 +3,10 @@
 
 #include "data.h"
 
+// 全局变量（在 main.c 中定义）
+extern User* userList;
+extern User* currentUser;
+
 // ==================== 用户管理 ====================
 
 /**
