@@ -1,7 +1,8 @@
-#ifndef FINANCE_H
+﻿#ifndef FINANCE_H
 #define FINANCE_H
 
 #include "data.h"
+#include <time.h>
 
 // 全局变量（在 main.c 中定义）
 extern FinanceRecord* financeList;
@@ -13,6 +14,11 @@ extern int financeIdCounter;
  * @brief 添加财务记录
  */
 void addFinanceRecord();
+
+/**
+ * @brief 查看财务记录
+ */
+void displayFinanceRecords();
 
 /**
  * @brief 导出财务报表

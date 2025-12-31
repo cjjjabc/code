@@ -173,7 +173,12 @@ void loadClubsFromFile() {
             printf("内存分配失败！\n");
             break;
         }
-        memcpy(newClub, &temp, sizeof(Club));
+        // 复制结构体内容，但要清空next指针
+        strcpy(newClub->name, temp.name);
+        strcpy(newClub->leader, temp.leader);
+        newClub->createTime = temp.createTime;
+        newClub->balance = temp.balance;
+        newClub->memberCount = temp.memberCount;
         newClub->next = clubList;
         clubList = newClub;
     }

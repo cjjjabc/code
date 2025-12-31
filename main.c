@@ -1,4 +1,4 @@
-#include<stdio.h>
+﻿#include<stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
@@ -27,8 +27,9 @@ int activityIdCounter = 2000;
         printf("\n=== 管理员菜单 ===\n");
         printf("1. 创建社团\n");
         printf("2. 查看所有社团\n");
-        printf("3. 导出财务报表\n");
-        printf("4. 查看系统日志\n");
+        printf("3. 查看财务记录\n");
+        printf("4. 导出财务报表\n");
+        printf("5. 查看系统日志\n");
         printf("0. 退出登录\n");
         printf("选择: ");
         scanf("%d", &choice);
@@ -36,8 +37,9 @@ int activityIdCounter = 2000;
         switch (choice) {
             case 1: createClub(); break;
             case 2: displayAllClubs(); break;
-            case 3: exportFinanceReport(); break;
-            case 4: displayLogs(); break;
+            case 3: displayFinanceRecords(); break;
+            case 4: exportFinanceReport(); break;
+            case 5: displayLogs(); break;
             case 0: 
                 logout();
                 printf("已退出登录\n");
@@ -56,7 +58,8 @@ void leaderMenu() {
         printf("1. 创建活动\n");
         printf("2. 查看本社团活动\n");
         printf("3. 添加财务记录\n");
-        printf("4. 查看社团余额\n");
+        printf("4. 查看财务记录\n");
+        printf("5. 查看社团余额\n");
         printf("0. 退出登录\n");
         printf("选择: ");
         scanf("%d", &choice);
@@ -69,7 +72,8 @@ void leaderMenu() {
                 }
                 break;
             case 3: addFinanceRecord(); break;
-            case 4: {
+            case 4: displayFinanceRecords(); break;
+            case 5: {
                 if (getCurrentUser()) {
                     Club* club = findClubByName(getCurrentUser()->clubName);
                     if (club) {
@@ -151,7 +155,7 @@ void initializeSystem() {
         }
     }
 
-    print_fmt("系统初始化完成\n");
+    printf("系统初始化完成\n");
 }
 
 /**
@@ -174,42 +178,7 @@ void cleanupSystem() {
     clearLogs();
 }
 
-// UTF-8 safe printing on Windows: format into UTF-8 then convert to wide and WriteConsoleW
-#ifdef _WIN32
-void print_utf8(const char* utf8) {
-    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (h == INVALID_HANDLE_VALUE) {
-        printf("%s", utf8);
-        return;
-    }
-    int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
-    if (wlen <= 0) {
-        printf("%s", utf8);
-        return;
-    }
-    wchar_t* wbuf = (wchar_t*)malloc(wlen * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wbuf, wlen);
-    DWORD written;
-    WriteConsoleW(h, wbuf, wlen - 1, &written, NULL);
-    free(wbuf);
-}
-
-void print_fmt(const char* fmt, ...) {
-    va_list ap;
-    va_start(ap, fmt);
-    int needed = vsnprintf(NULL, 0, fmt, ap);
-    va_end(ap);
-    if (needed < 0) { return; }
-    char* buf = (char*)malloc(needed + 1);
-    va_start(ap, fmt);
-    vsnprintf(buf, needed + 1, fmt, ap);
-    va_end(ap);
-    print_utf8(buf);
-    free(buf);
-}
-#else
-#define print_fmt(...) printf(__VA_ARGS__)
-#endif
+// ============================== 主菜单部分 ==============================
 
 /**
  * @brief 主函数

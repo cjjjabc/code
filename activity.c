@@ -1,4 +1,4 @@
-#include "activity.h"
+﻿#include "activity.h"
 #include "auth.h"
 #include "utils.h"
 #include <stdio.h>
@@ -260,7 +260,15 @@ void loadActivitiesFromFile() {
             printf("内存分配失败！\n");
             break;
         }
-        memcpy(newActivity, &temp, sizeof(Activity));
+        // 逐个字段复制，避免复制无效的指针
+        newActivity->id = temp.id;
+        strcpy(newActivity->clubName, temp.clubName);
+        strcpy(newActivity->name, temp.name);
+        strcpy(newActivity->description, temp.description);
+        newActivity->startTime = temp.startTime;
+        newActivity->endTime = temp.endTime;
+        newActivity->maxParticipants = temp.maxParticipants;
+        newActivity->currentParticipants = temp.currentParticipants;
         newActivity->next = activityList;
         activityList = newActivity;
     }
@@ -306,7 +314,10 @@ void loadEnrollmentsFromFile() {
             printf("内存分配失败！\n");
             break;
         }
-        memcpy(newEnroll, &temp, sizeof(Enrollment));
+        // 逐个字段复制，避免复制无效的指针
+        strcpy(newEnroll->username, temp.username);
+        newEnroll->activityId = temp.activityId;
+        newEnroll->enrollTime = temp.enrollTime;
         newEnroll->next = enrollmentList;
         enrollmentList = newEnroll;
     }

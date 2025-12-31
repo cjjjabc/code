@@ -1,4 +1,4 @@
-#include "utils.h"
+﻿#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +6,40 @@
 #include <time.h>
 
 // 全局日志链表在 main.c 中定义，此处仅使用
+
+#ifdef _WIN32
+void print_utf8(const char* utf8) {
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (h == INVALID_HANDLE_VALUE) {
+        fprintf(stdout, "%s", utf8);
+        return;
+    }
+    int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
+    if (wlen <= 0) {
+        fprintf(stdout, "%s", utf8);
+        return;
+    }
+    wchar_t* wbuf = (wchar_t*)malloc(wlen * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wbuf, wlen);
+    DWORD written;
+    WriteConsoleW(h, wbuf, wlen - 1, &written, NULL);
+    free(wbuf);
+}
+
+void printf_wrapper(const char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    int needed = vsnprintf(NULL, 0, fmt, ap);
+    va_end(ap);
+    if (needed < 0) { return; }
+    char* buf = (char*)malloc(needed + 1);
+    va_start(ap, fmt);
+    vsnprintf(buf, needed + 1, fmt, ap);
+    va_end(ap);
+    print_utf8(buf);
+    free(buf);
+}
+#endif
 
 /**
  * @brief 添加系统日志

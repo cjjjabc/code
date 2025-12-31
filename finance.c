@@ -87,6 +87,96 @@ void addFinanceRecord() {
 }
 
 /**
+ * @brief 查看财务记录
+ */
+void displayFinanceRecords() {
+    User* user = getCurrentUser();
+    if (!user) {
+        printf("请先登录！\n");
+        return;
+    }
+
+    printf("\n=== 财务记录 ===\n");
+    
+    // 社长只能查看自己社团的记录
+    if (user->role == ROLE_LEADER) {
+        printf("社团: %s\n", user->clubName);
+        int count = 0;
+        FinanceRecord* current = financeList;
+        while (current) {
+            if (strcmp(current->clubName, user->clubName) == 0) {
+                count++;
+                char timeStr[20];
+                struct tm* timeinfo = localtime(&current->time);
+                strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", timeinfo);
+                printf("[ID:%d] %s | %s | %.2f元 | %s\n",
+                       current->id,
+                       timeStr,
+                       current->type == FINANCE_INCOME ? "收入" : "支出",
+                       current->amount,
+                       current->description);
+            }
+            current = current->next;
+        }
+        if (count == 0) {
+            printf("暂无财务记录\n");
+        }
+    }
+    // 管理员可以查看所有社团的记录
+    else if (user->role == ROLE_ADMIN) {
+        char clubName[MAX_NAME_LEN];
+        printf("请输入社团名称 (留空查看所有): ");
+        getchar(); // 清除缓冲区
+        fgets(clubName, MAX_NAME_LEN, stdin);
+        trimNewline(clubName);
+        
+        int count = 0;
+        FinanceRecord* current = financeList;
+        
+        if (strlen(clubName) == 0) {
+            printf("\n所有财务记录：\n");
+            while (current) {
+                count++;
+                char timeStr[20];
+                struct tm* timeinfo = localtime(&current->time);
+                strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", timeinfo);
+                printf("[ID:%d] %s | %s | %.2f元 | %s | %s\n",
+                       current->id,
+                       timeStr,
+                       current->type == FINANCE_INCOME ? "收入" : "支出",
+                       current->amount,
+                       current->clubName,
+                       current->description);
+                current = current->next;
+            }
+        } else {
+            printf("\n社团 %s 的财务记录：\n", clubName);
+            while (current) {
+                if (strcmp(current->clubName, clubName) == 0) {
+                    count++;
+                    char timeStr[20];
+                    struct tm* timeinfo = localtime(&current->time);
+                    strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", timeinfo);
+                    printf("[ID:%d] %s | %s | %.2f元 | %s\n",
+                           current->id,
+                           timeStr,
+                           current->type == FINANCE_INCOME ? "收入" : "支出",
+                           current->amount,
+                           current->description);
+                }
+                current = current->next;
+            }
+        }
+        
+        if (count == 0) {
+            printf("暂无财务记录\n");
+        }
+    } else {
+        printf("权限不足！\n");
+    }
+}
+
+/**
  * @brief 导出财务报表
  */
 void exportFinanceReport() {
@@ -223,7 +313,13 @@ void loadFinanceFromFile() {
             printf("内存分配失败！\n");
             break;
         }
-        memcpy(newRecord, &temp, sizeof(FinanceRecord));
+        // 逐个字段复制，避免复制无效的指针
+        newRecord->id = temp.id;
+        strcpy(newRecord->clubName, temp.clubName);
+        newRecord->type = temp.type;
+        newRecord->amount = temp.amount;
+        strcpy(newRecord->description, temp.description);
+        newRecord->time = temp.time;
         newRecord->next = financeList;
         financeList = newRecord;
     }

@@ -2,6 +2,18 @@
 #define UTILS_H
 
 #include "data.h"
+#include <stdio.h>
+#include <stdarg.h>
+
+#ifdef _WIN32
+#include <windows.h>
+void print_utf8(const char* utf8);
+void printf_wrapper(const char* fmt, ...);
+#define printf printf_wrapper
+#define print_fmt(...) printf_wrapper(__VA_ARGS__)
+#else
+#define print_fmt(...) printf(__VA_ARGS__)
+#endif
 
 // 全局日志链表（在 main.c 中定义）
 extern Log* logList;

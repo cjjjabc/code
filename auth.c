@@ -1,4 +1,4 @@
-#include "auth.h"
+﻿#include "auth.h"
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,7 +127,12 @@ void loadUsersFromFile() {
             printf("内存分配失败！\n");
             break;
         }
-        memcpy(newUser, &temp, sizeof(User));
+        // 逐个字段复制，避免复制无效的指针
+        strcpy(newUser->username, temp.username);
+        strcpy(newUser->password, temp.password);
+        newUser->role = temp.role;
+        strcpy(newUser->clubName, temp.clubName);
+        newUser->position = temp.position;
         newUser->next = userList;
         userList = newUser;
     }
